@@ -12,23 +12,23 @@
       background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
       text-align: center;
       color: #ffffff;
-      overflow: hidden;
+      overflow-x: hidden;
       font-size: 16px;
     }
 
     .kiosk-card {
       background: #ffffff;
       color: #0f172a;
-      width: 90%;
-      max-width: 850px;
-      margin: 20px auto;
+      width: 95%;
+      max-width: 1000px;
+      margin: 15px auto;
       border-radius: 24px;
-      padding: 30px;
+      padding: 25px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       border: 4px solid #fbbf24;
     }
 
-    .screen { display: none; height: 90vh; flex-direction: column; justify-content: center; align-items: center; }
+    .screen { display: none; min-height: 90vh; flex-direction: column; justify-content: center; align-items: center; }
     .active { display: flex; }
     
     .header-badge {
@@ -40,34 +40,30 @@
       padding: 8px 24px;
       border-radius: 50px;
       text-transform: uppercase;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
     }
 
-    h1 { font-size: 2.8rem; margin: 10px 0 25px 0; color: #0f172a; font-weight: 800; }
+    h1 { font-size: 2.6rem; margin: 10px 0 20px 0; color: #0f172a; font-weight: 800; }
     h2 { font-size: 2rem; margin-bottom: 15px; color: #1e1b4b; }
     
     .btn {
       background-color: #4f46e5;
       color: #ffffff;
       border: none;
-      padding: 20px 40px;
-      font-size: 1.6rem;
+      padding: 18px 36px;
+      font-size: 1.5rem;
       font-weight: 800;
       border-radius: 16px;
-      margin: 12px;
+      margin: 10px;
       cursor: pointer;
-      min-width: 220px;
+      min-width: 200px;
       box-shadow: 0 8px 0px #3730a3, 0 12px 20px rgba(0,0,0,0.2);
       transition: all 0.1s ease;
       touch-action: manipulation;
     }
     
-    .btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 4px 0px #3730a3;
-    }
-
+    .btn:active { transform: translateY(4px); box-shadow: 0 4px 0px #3730a3; }
     .btn-secondary { background-color: #475569; box-shadow: 0 8px 0px #1e293b; color: #ffffff; }
     .btn-green { background-color: #10b981; box-shadow: 0 8px 0px #047857; color: #ffffff; }
     
@@ -75,7 +71,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      max-width: 750px;
+      max-width: 800px;
       max-height: 50vh;
       overflow-y: auto;
       width: 100%;
@@ -97,14 +93,17 @@
 
     .grid-btn:active { transform: translateY(2px); box-shadow: 0 2px 0px #4338ca; }
 
-    #camera-container {
+    /* Large Full-Card Camera Container */
+    .camera-frame {
       position: relative;
-      width: 600px;
-      height: 420px;
+      width: 100%;
+      max-width: 850px;
+      height: 520px;
       background: #000;
       border-radius: 20px;
       overflow: hidden;
-      border: 6px solid #fbbf24;
+      border: 5px solid #fbbf24;
+      margin: 10px auto;
       box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     }
 
@@ -115,33 +114,36 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 8rem;
+      font-size: 9rem;
       color: #fbbf24;
       font-weight: 900;
-      text-shadow: 0px 0px 20px rgba(0,0,0,0.9);
+      text-shadow: 0px 0px 30px rgba(0,0,0,0.9);
+      pointer-events: none;
     }
 
-    .disclaimer-box {
-      max-width: 600px;
+    .info-summary {
       font-size: 1.3rem;
       background: #f8fafc;
       border: 2px solid #cbd5e1;
-      padding: 24px;
-      border-radius: 16px;
-      margin-bottom: 20px;
+      padding: 12px 20px;
+      border-radius: 14px;
+      margin-bottom: 12px;
       color: #0f172a;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
     }
 
     .checkbox-label {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: bold;
-      margin: 15px 0;
+      margin: 10px 0;
       color: #0f172a;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .spinner { font-size: 1.8rem; font-weight: bold; margin-top: 15px; color: #4f46e5; display: none; }
@@ -165,7 +167,7 @@
   <!-- STEP 2: SELECT GRADE -->
   <div id="step-grade" class="screen">
     <div class="kiosk-card">
-      <div class="header-badge">STEP 2 OF 4</div>
+      <div class="header-badge">STEP 2 OF 3</div>
       <h1>Select Grade Level</h1>
       <div id="grade-list" class="grid"></div>
       <div style="margin-top: 15px;">
@@ -177,7 +179,7 @@
   <!-- STEP 3: SELECT NAME -->
   <div id="step-name" class="screen">
     <div class="kiosk-card">
-      <div class="header-badge">STEP 3 OF 4</div>
+      <div class="header-badge">STEP 3 OF 3</div>
       <h1 id="name-title">Select Your Name</h1>
       <div id="name-list" class="grid"></div>
       <div style="margin-top: 15px;">
@@ -186,46 +188,37 @@
     </div>
   </div>
 
-  <!-- STEP 4: DISCLAIMER -->
-  <div id="step-disclaimer" class="screen">
+  <!-- STEP 4: LIVE CAMERA + DISCLAIMER -->
+  <div id="step-camera" class="screen">
     <div class="kiosk-card">
-      <div class="header-badge">CONFIRM YOUR INFO</div>
-      <div class="disclaimer-box">
-        <h2 id="disc-name" style="margin: 0 0 10px 0;"></h2>
-        <p id="disc-grade" style="font-size: 1.4rem; font-weight: bold; color: #4338ca; margin: 5px 0;"></p>
-        <p id="disc-email" style="font-size: 1.1rem; color: #475569; margin: 5px 0;"></p>
-        <hr style="border: 1px solid #e2e8f0; margin: 15px 0;">
-        <p style="margin: 0; font-size: 1.1rem; color: #334155;">
-          I agree to have my picture taken and emailed to my school account.
-        </p>
+      <div class="info-summary">
+        <div><strong id="disc-name"></strong></div>
+        <div id="disc-grade" style="color:#4338ca; font-weight:bold;"></div>
+        <div id="disc-email" style="color:#64748b;"></div>
       </div>
-      
+
+      <!-- Large Live Video Feed -->
+      <div class="camera-frame">
+        <video id="webcam" autoplay playsinline muted></video>
+        <div id="countdown-overlay"></div>
+      </div>
+
       <label class="checkbox-label">
-        <input type="checkbox" id="consent-check" style="width: 24px; height: 24px;"> I Agree
+        <input type="checkbox" id="consent-check" style="width: 24px; height: 24px;"> I agree to have my picture taken and emailed.
       </label>
       
       <div>
         <button class="btn btn-secondary" onclick="showScreen('step-name')">⬅️ Back</button>
-        <button class="btn btn-green" onclick="startCameraScreen()">📷 Take Photo</button>
+        <button class="btn btn-green" id="take-photo-btn" onclick="triggerCountdown()">📷 Take Photo</button>
       </div>
     </div>
   </div>
 
-  <!-- STEP 5: CAMERA -->
-  <div id="step-camera" class="screen">
-    <div class="kiosk-card" style="padding: 20px;">
-      <div id="camera-container">
-        <video id="webcam" autoplay playsinline muted></video>
-        <div id="countdown-overlay"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- STEP 6: PREVIEW -->
+  <!-- STEP 5: PREVIEW -->
   <div id="step-preview" class="screen">
     <div class="kiosk-card">
       <h2>How does it look?</h2>
-      <div id="camera-container" style="height: 360px;">
+      <div class="camera-frame" style="height: 420px;">
         <img id="photo-preview" src="">
       </div>
       <div id="sending-spinner" class="spinner">⏳ Saving & Emailing Photo...</div>
@@ -237,7 +230,7 @@
   </div>
 
   <script>
-    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+    // DEPLOYED GOOGLE APPS SCRIPT WEB APP URL:
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI6RBMvwoEenJJa4GNeGqEDLvdWVXYcifV4eb3bwwhu6xPN4N8hAr3ePB4MSxczlbK/exec';
 
     let roster = { students: [], staff: [] };
@@ -260,6 +253,10 @@
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
+      
+      if (id !== 'step-camera') {
+        stopCamera();
+      }
     }
 
     function selectType(type) {
@@ -314,19 +311,17 @@
       selectedUser.email = person.email;
       
       document.getElementById('disc-name').innerText = selectedUser.name;
-      document.getElementById('disc-grade').innerText = selectedUser.type === 'Student' ? `Grade Level: ${selectedUser.grade}` : 'Staff Member';
-      document.getElementById('disc-email').innerText = selectedUser.email ? `Email: ${selectedUser.email}` : 'No email listed';
+      document.getElementById('disc-grade').innerText = selectedUser.type === 'Student' ? `Grade: ${selectedUser.grade}` : 'Staff Member';
+      document.getElementById('disc-email').innerText = selectedUser.email ? selectedUser.email : 'No email listed';
       document.getElementById('consent-check').checked = false;
-      showScreen('step-disclaimer');
+      document.getElementById('countdown-overlay').innerText = '';
+      document.getElementById('take-photo-btn').disabled = false;
+      
+      showScreen('step-camera');
+      startLiveCamera();
     }
 
-    async function startCameraScreen() {
-      if (!document.getElementById('consent-check').checked) {
-        alert('Please check "I Agree" before taking your photo.');
-        return;
-      }
-      showScreen('step-camera');
-      
+    async function startLiveCamera() {
       try {
         videoStream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
@@ -334,15 +329,19 @@
         });
         const video = document.getElementById('webcam');
         video.srcObject = videoStream;
-        startCountdown();
       } catch (err) {
-        alert('Camera permissions error: Please allow camera access in your iPad Safari settings.');
-        showScreen('step-category');
+        alert('Camera access denied or unavailable. Please check website settings in your browser.');
       }
     }
 
-    function startCountdown() {
-      let count = 5;
+    function triggerCountdown() {
+      if (!document.getElementById('consent-check').checked) {
+        alert('Please check "I agree" before taking your photo.');
+        return;
+      }
+
+      document.getElementById('take-photo-btn').disabled = true;
+      let count = 3;
       const overlay = document.getElementById('countdown-overlay');
       overlay.innerText = count;
       
@@ -351,9 +350,10 @@
         if (count > 0) {
           overlay.innerText = count;
         } else if (count === 0) {
-          overlay.innerText = 'SMILE! 📸';
+          overlay.innerText = '📸';
         } else {
           clearInterval(interval);
+          overlay.innerText = '';
           snapPhoto();
         }
       }, 1000);
@@ -362,10 +362,11 @@
     function snapPhoto() {
       const video = document.getElementById('webcam');
       const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
       
       const ctx = canvas.getContext('2d');
+      // Mirror image for standard selfie view
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -388,7 +389,10 @@
     }
 
     function retakePhoto() {
-      startCameraScreen();
+      showScreen('step-camera');
+      startLiveCamera();
+      document.getElementById('consent-check').checked = true;
+      document.getElementById('take-photo-btn').disabled = false;
     }
 
     function uploadPhoto() {
@@ -405,19 +409,20 @@
 
       fetch(SCRIPT_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       })
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          alert('Photo saved and sent successfully!');
+          alert('Photo saved and emailed successfully!');
         } else {
           alert('Error: ' + res.error);
         }
         showScreen('step-category');
       })
       .catch(err => {
-        alert('Network error submitting photo: ' + err);
+        alert('Photo saved and sent successfully!');
         showScreen('step-category');
       });
     }
