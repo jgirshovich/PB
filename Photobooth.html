@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Booth Kiosk</title>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      text-align: center;
+      color: #ffffff;
+      overflow: hidden;
+      font-size: 16px;
+    }
+
+    .kiosk-card {
+      background: #ffffff;
+      color: #0f172a;
+      width: 90%;
+      max-width: 850px;
+      margin: 20px auto;
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      border: 4px solid #fbbf24;
+    }
+
+    .screen { display: none; height: 90vh; flex-direction: column; justify-content: center; align-items: center; }
+    .active { display: flex; }
+    
+    .header-badge {
+      background: #f59e0b;
+      color: #000000;
+      font-weight: 900;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      padding: 8px 24px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
+    }
+
+    h1 { font-size: 2.8rem; margin: 10px 0 25px 0; color: #0f172a; font-weight: 800; }
+    h2 { font-size: 2rem; margin-bottom: 15px; color: #1e1b4b; }
+    
+    .btn {
+      background-color: #4f46e5;
+      color: #ffffff;
+      border: none;
+      padding: 20px 40px;
+      font-size: 1.6rem;
+      font-weight: 800;
+      border-radius: 16px;
+      margin: 12px;
+      cursor: pointer;
+      min-width: 220px;
+      box-shadow: 0 8px 0px #3730a3, 0 12px 20px rgba(0,0,0,0.2);
+      transition: all 0.1s ease;
+      touch-action: manipulation;
+    }
+    
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0px #3730a3;
+    }
+
+    .btn-secondary { background-color: #475569; box-shadow: 0 8px 0px #1e293b; color: #ffffff; }
+    .btn-green { background-color: #10b981; box-shadow: 0 8px 0px #047857; color: #ffffff; }
+    
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 750px;
+      max-height: 50vh;
+      overflow-y: auto;
+      width: 100%;
+      padding: 10px;
+    }
+
+    .grid-btn {
+      background: #e0e7ff;
+      border: 3px solid #4338ca;
+      color: #1e1b4b;
+      font-weight: 800;
+      border-radius: 12px;
+      padding: 18px 28px;
+      margin: 8px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: 0 4px 0px #4338ca;
+    }
+
+    .grid-btn:active { transform: translateY(2px); box-shadow: 0 2px 0px #4338ca; }
+
+    #camera-container {
+      position: relative;
+      width: 600px;
+      height: 420px;
+      background: #000;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 6px solid #fbbf24;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    video, canvas, img { width: 100%; height: 100%; object-fit: cover; }
+
+    #countdown-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8rem;
+      color: #fbbf24;
+      font-weight: 900;
+      text-shadow: 0px 0px 20px rgba(0,0,0,0.9);
+    }
+
+    .disclaimer-box {
+      max-width: 600px;
+      font-size: 1.3rem;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      color: #0f172a;
+    }
+
+    .checkbox-label {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin: 15px 0;
+      color: #0f172a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .spinner { font-size: 1.8rem; font-weight: bold; margin-top: 15px; color: #4f46e5; display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- STEP 1: SELECT CATEGORY -->
+  <div id="step-category" class="screen active">
+    <div class="kiosk-card">
+      <div class="header-badge">📸 SMILE & TAKE A PICTURE</div>
+      <h1>Welcome to the Photo Booth!</h1>
+      <div id="loading-roster-msg" style="color:#64748b; font-size:1.2rem; margin-bottom:15px;">Loading Roster Data...</div>
+      <div>
+        <button class="btn" onclick="selectType('Student')">🎓 Student</button>
+        <button class="btn" onclick="selectType('Staff')">🏫 Staff</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: SELECT GRADE -->
+  <div id="step-grade" class="screen">
+    <div class="kiosk-card">
+      <div class="header-badge">STEP 2 OF 4</div>
+      <h1>Select Grade Level</h1>
+      <div id="grade-list" class="grid"></div>
+      <div style="margin-top: 15px;">
+        <button class="btn btn-secondary" onclick="showScreen('step-category')">⬅️ Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: SELECT NAME -->
+  <div id="step-name" class="screen">
+    <div class="kiosk-card">
+      <div class="header-badge">STEP 3 OF 4</div>
+      <h1 id="name-title">Select Your Name</h1>
+      <div id="name-list" class="grid"></div>
+      <div style="margin-top: 15px;">
+        <button class="btn btn-secondary" id="name-back-btn">⬅️ Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: DISCLAIMER -->
+  <div id="step-disclaimer" class="screen">
+    <div class="kiosk-card">
+      <div class="header-badge">CONFIRM YOUR INFO</div>
+      <div class="disclaimer-box">
+        <h2 id="disc-name" style="margin: 0 0 10px 0;"></h2>
+        <p id="disc-grade" style="font-size: 1.4rem; font-weight: bold; color: #4338ca; margin: 5px 0;"></p>
+        <p id="disc-email" style="font-size: 1.1rem; color: #475569; margin: 5px 0;"></p>
+        <hr style="border: 1px solid #e2e8f0; margin: 15px 0;">
+        <p style="margin: 0; font-size: 1.1rem; color: #334155;">
+          I agree to have my picture taken and emailed to my school account.
+        </p>
+      </div>
+      
+      <label class="checkbox-label">
+        <input type="checkbox" id="consent-check" style="width: 24px; height: 24px;"> I Agree
+      </label>
+      
+      <div>
+        <button class="btn btn-secondary" onclick="showScreen('step-name')">⬅️ Back</button>
+        <button class="btn btn-green" onclick="startCameraScreen()">📷 Take Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5: CAMERA -->
+  <div id="step-camera" class="screen">
+    <div class="kiosk-card" style="padding: 20px;">
+      <div id="camera-container">
+        <video id="webcam" autoplay playsinline muted></video>
+        <div id="countdown-overlay"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6: PREVIEW -->
+  <div id="step-preview" class="screen">
+    <div class="kiosk-card">
+      <h2>How does it look?</h2>
+      <div id="camera-container" style="height: 360px;">
+        <img id="photo-preview" src="">
+      </div>
+      <div id="sending-spinner" class="spinner">⏳ Saving & Emailing Photo...</div>
+      <div id="preview-actions" style="margin-top: 15px;">
+        <button class="btn btn-secondary" onclick="retakePhoto()">🔄 Retake</button>
+        <button class="btn btn-green" id="keep-btn" onclick="uploadPhoto()">✨ Keep & Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI6RBMvwoEenJJa4GNeGqEDLvdWVXYcifV4eb3bwwhu6xPN4N8hAr3ePB4MSxczlbK/exec';
+
+    let roster = { students: [], staff: [] };
+    let selectedUser = { type: '', name: '', grade: '', email: '' };
+    let videoStream = null;
+    let capturedBase64 = '';
+
+    window.onload = function() {
+      fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+          roster = data;
+          document.getElementById('loading-roster-msg').style.display = 'none';
+        })
+        .catch(err => {
+          document.getElementById('loading-roster-msg').innerText = 'Error loading roster data.';
+        });
+    };
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function selectType(type) {
+      selectedUser.type = type;
+      if (type === 'Student') {
+        renderGrades();
+        showScreen('step-grade');
+      } else {
+        renderNames(roster.staff);
+        document.getElementById('name-title').innerText = 'Select Staff Name';
+        document.getElementById('name-back-btn').onclick = () => showScreen('step-category');
+        showScreen('step-name');
+      }
+    }
+
+    function renderGrades() {
+      const grades = [...new Set(roster.students.map(s => s.grade))].sort();
+      const container = document.getElementById('grade-list');
+      container.innerHTML = '';
+      grades.forEach(g => {
+        const btn = document.createElement('button');
+        btn.className = 'grid-btn';
+        btn.innerText = `Grade ${g}`;
+        btn.onclick = () => selectGrade(g);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectGrade(grade) {
+      selectedUser.grade = grade;
+      const filteredStudents = roster.students.filter(s => s.grade === grade);
+      renderNames(filteredStudents);
+      document.getElementById('name-title').innerText = `Grade ${grade} Roster`;
+      document.getElementById('name-back-btn').onclick = () => showScreen('step-grade');
+      showScreen('step-name');
+    }
+
+    function renderNames(list) {
+      const container = document.getElementById('name-list');
+      container.innerHTML = '';
+      list.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'grid-btn';
+        btn.innerText = item.name;
+        btn.onclick = () => selectPerson(item);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectPerson(person) {
+      selectedUser.name = person.name;
+      selectedUser.email = person.email;
+      
+      document.getElementById('disc-name').innerText = selectedUser.name;
+      document.getElementById('disc-grade').innerText = selectedUser.type === 'Student' ? `Grade Level: ${selectedUser.grade}` : 'Staff Member';
+      document.getElementById('disc-email').innerText = selectedUser.email ? `Email: ${selectedUser.email}` : 'No email listed';
+      document.getElementById('consent-check').checked = false;
+      showScreen('step-disclaimer');
+    }
+
+    async function startCameraScreen() {
+      if (!document.getElementById('consent-check').checked) {
+        alert('Please check "I Agree" before taking your photo.');
+        return;
+      }
+      showScreen('step-camera');
+      
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
+          audio: false
+        });
+        const video = document.getElementById('webcam');
+        video.srcObject = videoStream;
+        startCountdown();
+      } catch (err) {
+        alert('Camera permissions error: Please allow camera access in your iPad Safari settings.');
+        showScreen('step-category');
+      }
+    }
+
+    function startCountdown() {
+      let count = 5;
+      const overlay = document.getElementById('countdown-overlay');
+      overlay.innerText = count;
+      
+      const interval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          overlay.innerText = count;
+        } else if (count === 0) {
+          overlay.innerText = 'SMILE! 📸';
+        } else {
+          clearInterval(interval);
+          snapPhoto();
+        }
+      }, 1000);
+    }
+
+    function snapPhoto() {
+      const video = document.getElementById('webcam');
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      
+      const ctx = canvas.getContext('2d');
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      capturedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+      document.getElementById('photo-preview').src = capturedBase64;
+      
+      stopCamera();
+      
+      document.getElementById('preview-actions').style.display = 'block';
+      document.getElementById('sending-spinner').style.display = 'none';
+      showScreen('step-preview');
+    }
+
+    function stopCamera() {
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null;
+      }
+    }
+
+    function retakePhoto() {
+      startCameraScreen();
+    }
+
+    function uploadPhoto() {
+      document.getElementById('preview-actions').style.display = 'none';
+      document.getElementById('sending-spinner').style.display = 'block';
+      
+      const payload = {
+        imageBase64: capturedBase64,
+        type: selectedUser.type,
+        name: selectedUser.name,
+        grade: selectedUser.grade,
+        email: selectedUser.email
+      };
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          alert('Photo saved and sent successfully!');
+        } else {
+          alert('Error: ' + res.error);
+        }
+        showScreen('step-category');
+      })
+      .catch(err => {
+        alert('Network error submitting photo: ' + err);
+        showScreen('step-category');
+      });
+    }
+  </script>
+</body>
+</html>
