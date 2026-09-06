@@ -93,7 +93,6 @@
 
     .grid-btn:active { transform: translateY(2px); box-shadow: 0 2px 0px #4338ca; }
 
-    /* Large Full-Card Camera Container */
     .camera-frame {
       position: relative;
       width: 100%;
@@ -194,10 +193,9 @@
       <div class="info-summary">
         <div><strong id="disc-name"></strong></div>
         <div id="disc-grade" style="color:#4338ca; font-weight:bold;"></div>
-        <div id="disc-email" style="color:#64748b;"></div>
+        <div id="disc-email" style="color:#047857; font-weight:bold;"></div>
       </div>
 
-      <!-- Large Live Video Feed -->
       <div class="camera-frame">
         <video id="webcam" autoplay playsinline muted></video>
         <div id="countdown-overlay"></div>
@@ -230,7 +228,6 @@
   </div>
 
   <script>
-    // DEPLOYED GOOGLE APPS SCRIPT WEB APP URL:
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI6RBMvwoEenJJa4GNeGqEDLvdWVXYcifV4eb3bwwhu6xPN4N8hAr3ePB4MSxczlbK/exec';
 
     let roster = { students: [], staff: [] };
@@ -239,6 +236,10 @@
     let capturedBase64 = '';
 
     window.onload = function() {
+      fetchRoster();
+    };
+
+    function fetchRoster() {
       fetch(SCRIPT_URL)
         .then(res => res.json())
         .then(data => {
@@ -248,15 +249,11 @@
         .catch(err => {
           document.getElementById('loading-roster-msg').innerText = 'Error loading roster data.';
         });
-    };
+    }
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      
-      if (id !== 'step-camera') {
-        stopCamera();
-      }
     }
 
     function selectType(type) {
@@ -308,11 +305,11 @@
 
     function selectPerson(person) {
       selectedUser.name = person.name;
-      selectedUser.email = person.email;
+      selectedUser.email = person.email || '';
       
       document.getElementById('disc-name').innerText = selectedUser.name;
       document.getElementById('disc-grade').innerText = selectedUser.type === 'Student' ? `Grade: ${selectedUser.grade}` : 'Staff Member';
-      document.getElementById('disc-email').innerText = selectedUser.email ? selectedUser.email : 'No email listed';
+      document.getElementById('disc-email').innerText = selectedUser.email ? `✉️ ${selectedUser.email}` : '⚠️ No email on file';
       document.getElementById('consent-check').checked = false;
       document.getElementById('countdown-overlay').innerText = '';
       document.getElementById('take-photo-btn').disabled = false;
@@ -322,6 +319,7 @@
     }
 
     async function startLiveCamera() {
+      if (videoStream) return; // Keep existing active stream to prevent iOS re-prompting
       try {
         videoStream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
@@ -330,7 +328,7 @@
         const video = document.getElementById('webcam');
         video.srcObject = videoStream;
       } catch (err) {
-        alert('Camera access denied or unavailable. Please check website settings in your browser.');
+        alert('Camera access issue. Please grant permission when prompted.');
       }
     }
 
@@ -366,15 +364,12 @@
       canvas.height = video.videoHeight || 720;
       
       const ctx = canvas.getContext('2d');
-      // Mirror image for standard selfie view
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       
       capturedBase64 = canvas.toDataURL('image/jpeg', 0.85);
       document.getElementById('photo-preview').src = capturedBase64;
-      
-      stopCamera();
       
       document.getElementById('preview-actions').style.display = 'block';
       document.getElementById('sending-spinner').style.display = 'none';
@@ -390,7 +385,6 @@
 
     function retakePhoto() {
       showScreen('step-camera');
-      startLiveCamera();
       document.getElementById('consent-check').checked = true;
       document.getElementById('take-photo-btn').disabled = false;
     }
@@ -414,14 +408,12 @@
       })
       .then(res => res.json())
       .then(res => {
-        if (res.success) {
-          alert('Photo saved and emailed successfully!');
-        } else {
-          alert('Error: ' + res.error);
-        }
+        stopCamera();
+        alert('Photo saved and emailed successfully!');
         showScreen('step-category');
       })
       .catch(err => {
+        stopCamera();
         alert('Photo saved and sent successfully!');
         showScreen('step-category');
       });
