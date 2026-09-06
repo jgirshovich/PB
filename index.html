@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Photo Booth Kiosk</title>
+  <title>St. Anne Photo Booth Kiosk</title>
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     
     body {
       margin: 0;
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      background: radial-gradient(circle at center, #312e81 0%, #1e1b4b 60%, #0f172a 100%);
       text-align: center;
       color: #ffffff;
       overflow-x: hidden;
@@ -20,59 +20,99 @@
       background: #ffffff;
       color: #0f172a;
       width: 95%;
-      max-width: 1000px;
-      margin: 15px auto;
-      border-radius: 24px;
-      padding: 25px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-      border: 4px solid #fbbf24;
+      max-width: 950px;
+      margin: 20px auto;
+      border-radius: 28px;
+      padding: 30px 25px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(251, 191, 36, 0.2);
+      border: 5px solid #fbbf24;
+      position: relative;
     }
 
-    .screen { display: none; min-height: 90vh; flex-direction: column; justify-content: center; align-items: center; }
+    .screen { display: none; min-height: 88vh; flex-direction: column; justify-content: center; align-items: center; }
     .active { display: flex; }
     
-    .header-badge {
-      background: #f59e0b;
-      color: #000000;
-      font-weight: 900;
-      font-size: 1.2rem;
-      letter-spacing: 2px;
-      padding: 8px 24px;
-      border-radius: 50px;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
+    /* Circular Logo Styling */
+    .logo-container {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 15px auto;
+      border-radius: 50%;
+      background: #ffffff;
+      padding: 5px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      border: 4px solid #312e81;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    h1 { font-size: 2.6rem; margin: 10px 0 20px 0; color: #0f172a; font-weight: 800; }
-    h2 { font-size: 2rem; margin-bottom: 15px; color: #1e1b4b; }
+    .school-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+
+    /* Festive Header Banner */
+    .header-badge {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 1.2rem;
+      letter-spacing: 3px;
+      padding: 10px 30px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+      display: inline-block;
+    }
+
+    h1 { font-size: 2.8rem; margin: 10px 0 15px 0; color: #1e1b4b; font-weight: 900; }
+    h2 { font-size: 2.2rem; margin-bottom: 15px; color: #1e1b4b; font-weight: 800; }
     
+    .subtitle {
+      font-size: 1.4rem;
+      color: #475569;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    /* Vibrant Fun Touch Buttons */
+    .btn-group {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
     .btn {
-      background-color: #4f46e5;
+      background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
       color: #ffffff;
       border: none;
-      padding: 18px 36px;
-      font-size: 1.5rem;
+      padding: 22px 42px;
+      font-size: 1.7rem;
       font-weight: 800;
-      border-radius: 16px;
-      margin: 10px;
+      border-radius: 20px;
       cursor: pointer;
-      min-width: 200px;
-      box-shadow: 0 8px 0px #3730a3, 0 12px 20px rgba(0,0,0,0.2);
+      min-width: 240px;
+      box-shadow: 0 8px 0px #1e1b4b, 0 12px 25px rgba(0,0,0,0.3);
       transition: all 0.1s ease;
       touch-action: manipulation;
     }
     
-    .btn:active { transform: translateY(4px); box-shadow: 0 4px 0px #3730a3; }
-    .btn-secondary { background-color: #475569; box-shadow: 0 8px 0px #1e293b; color: #ffffff; }
-    .btn-green { background-color: #10b981; box-shadow: 0 8px 0px #047857; color: #ffffff; }
+    .btn:active { transform: translateY(4px); box-shadow: 0 4px 0px #1e1b4b; }
+    .btn-secondary { background: linear-gradient(135deg, #64748b 0%, #475569 100%); box-shadow: 0 8px 0px #1e293b; color: #ffffff; }
+    .btn-green { background: linear-gradient(135deg, #10b981 0%, #047857 100%); box-shadow: 0 8px 0px #064e3b; color: #ffffff; }
     
     .grid {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       max-width: 800px;
-      max-height: 50vh;
+      max-height: 48vh;
       overflow-y: auto;
       width: 100%;
       padding: 10px;
@@ -83,7 +123,7 @@
       border: 3px solid #4338ca;
       color: #1e1b4b;
       font-weight: 800;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 18px 28px;
       margin: 8px;
       font-size: 1.3rem;
@@ -97,7 +137,7 @@
       position: relative;
       width: 100%;
       max-width: 850px;
-      height: 520px;
+      height: 500px;
       background: #000;
       border-radius: 20px;
       overflow: hidden;
@@ -136,7 +176,7 @@
     .checkbox-label {
       font-size: 1.3rem;
       font-weight: bold;
-      margin: 10px 0;
+      margin: 12px 0;
       color: #0f172a;
       cursor: pointer;
       display: flex;
@@ -150,13 +190,18 @@
 </head>
 <body>
 
-  <!-- STEP 1: SELECT CATEGORY -->
+  <!-- STEP 1: SELECT CATEGORY (HOME SCREEN) -->
   <div id="step-category" class="screen active">
     <div class="kiosk-card">
-      <div class="header-badge">📸 SMILE & TAKE A PICTURE</div>
-      <h1>Welcome to the Photo Booth!</h1>
+      <div class="logo-container">
+        <!-- School Logo -->
+        <img src="logo.png" alt="St. Anne School Logo" class="school-logo" onerror="this.style.display='none'">
+      </div>
+      <div class="header-badge">✨ St. Anne Photo Booth ✨</div>
+      <h1>Smile & Say Cheese! 📸</h1>
+      <div class="subtitle">Tap below to get started</div>
       <div id="loading-roster-msg" style="color:#64748b; font-size:1.2rem; margin-bottom:15px;">Loading Roster Data...</div>
-      <div>
+      <div class="btn-group">
         <button class="btn" onclick="selectType('Student')">🎓 Student</button>
         <button class="btn" onclick="selectType('Staff')">🏫 Staff</button>
       </div>
@@ -216,7 +261,7 @@
   <div id="step-preview" class="screen">
     <div class="kiosk-card">
       <h2>How does it look?</h2>
-      <div class="camera-frame" style="height: 420px;">
+      <div class="camera-frame" style="height: 400px;">
         <img id="photo-preview" src="">
       </div>
       <div id="sending-spinner" class="spinner">⏳ Saving & Emailing Photo...</div>
@@ -319,7 +364,7 @@
     }
 
     async function startLiveCamera() {
-      if (videoStream) return; // Keep existing active stream to prevent iOS re-prompting
+      if (videoStream) return;
       try {
         videoStream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
@@ -328,7 +373,7 @@
         const video = document.getElementById('webcam');
         video.srcObject = videoStream;
       } catch (err) {
-        alert('Camera access issue. Please grant permission when prompted.');
+        alert('Camera access issue. Please check browser settings.');
       }
     }
 
