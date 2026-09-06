@@ -2,49 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>St. Anne Photo Booth Kiosk</title>
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    * { 
+      box-sizing: border-box; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
     
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
       background: radial-gradient(circle at center, #312e81 0%, #1e1b4b 60%, #0f172a 100%);
-      text-align: center;
+      background-attachment: fixed;
       color: #ffffff;
       overflow-x: hidden;
       font-size: 16px;
+    }
+
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
     .kiosk-card {
       background: #ffffff;
       color: #0f172a;
       width: 95%;
-      max-width: 950px;
-      margin: 20px auto;
+      max-width: 900px;
+      margin: 15px auto;
       border-radius: 28px;
-      padding: 30px 25px;
+      padding: 25px 20px;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(251, 191, 36, 0.2);
       border: 5px solid #fbbf24;
       position: relative;
     }
 
-    .screen { display: none; min-height: 88vh; flex-direction: column; justify-content: center; align-items: center; }
+    .screen { display: none; width: 100%; min-height: 85vh; flex-direction: column; justify-content: center; align-items: center; }
     .active { display: flex; }
     
-    /* Circular Logo Styling */
+    /* Circular Logo Container */
     .logo-container {
-      width: 140px;
-      height: 140px;
+      width: 130px;
+      height: 130px;
       margin: 0 auto 15px auto;
       border-radius: 50%;
       background: #ffffff;
-      padding: 5px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      padding: 6px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
       border: 4px solid #312e81;
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
     }
 
     .school-logo {
@@ -54,32 +76,30 @@
       border-radius: 50%;
     }
 
-    /* Festive Header Banner */
     .header-badge {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       color: #ffffff;
       font-weight: 900;
       font-size: 1.2rem;
-      letter-spacing: 3px;
-      padding: 10px 30px;
+      letter-spacing: 2px;
+      padding: 8px 24px;
       border-radius: 50px;
       text-transform: uppercase;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
       display: inline-block;
     }
 
-    h1 { font-size: 2.8rem; margin: 10px 0 15px 0; color: #1e1b4b; font-weight: 900; }
-    h2 { font-size: 2.2rem; margin-bottom: 15px; color: #1e1b4b; font-weight: 800; }
+    h1 { font-size: 2.5rem; margin: 8px 0 12px 0; color: #1e1b4b; font-weight: 900; }
+    h2 { font-size: 2rem; margin-bottom: 12px; color: #1e1b4b; font-weight: 800; }
     
     .subtitle {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       color: #475569;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       font-weight: 600;
     }
 
-    /* Vibrant Fun Touch Buttons */
     .btn-group {
       display: flex;
       gap: 20px;
@@ -92,12 +112,12 @@
       background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
       color: #ffffff;
       border: none;
-      padding: 22px 42px;
-      font-size: 1.7rem;
+      padding: 20px 38px;
+      font-size: 1.6rem;
       font-weight: 800;
       border-radius: 20px;
       cursor: pointer;
-      min-width: 240px;
+      min-width: 220px;
       box-shadow: 0 8px 0px #1e1b4b, 0 12px 25px rgba(0,0,0,0.3);
       transition: all 0.1s ease;
       touch-action: manipulation;
@@ -112,7 +132,7 @@
       flex-wrap: wrap;
       justify-content: center;
       max-width: 800px;
-      max-height: 48vh;
+      max-height: 45vh;
       overflow-y: auto;
       width: 100%;
       padding: 10px;
@@ -124,7 +144,7 @@
       color: #1e1b4b;
       font-weight: 800;
       border-radius: 14px;
-      padding: 18px 28px;
+      padding: 16px 26px;
       margin: 8px;
       font-size: 1.3rem;
       cursor: pointer;
@@ -136,8 +156,8 @@
     .camera-frame {
       position: relative;
       width: 100%;
-      max-width: 850px;
-      height: 500px;
+      max-width: 800px;
+      height: 450px;
       background: #000;
       border-radius: 20px;
       overflow: hidden;
@@ -153,7 +173,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 9rem;
+      font-size: 8rem;
       color: #fbbf24;
       font-weight: 900;
       text-shadow: 0px 0px 30px rgba(0,0,0,0.9);
@@ -161,12 +181,12 @@
     }
 
     .info-summary {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       background: #f8fafc;
       border: 2px solid #cbd5e1;
-      padding: 12px 20px;
+      padding: 10px 18px;
       border-radius: 14px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       color: #0f172a;
       display: flex;
       justify-content: space-around;
@@ -174,9 +194,9 @@
     }
 
     .checkbox-label {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: bold;
-      margin: 12px 0;
+      margin: 10px 0;
       color: #0f172a;
       cursor: pointer;
       display: flex;
@@ -185,17 +205,50 @@
       gap: 10px;
     }
 
-    .spinner { font-size: 1.8rem; font-weight: bold; margin-top: 15px; color: #4f46e5; display: none; }
+    /* Modal Success Toast */
+    .success-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.9);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .success-box {
+      background: #ffffff;
+      color: #0f172a;
+      padding: 40px;
+      border-radius: 30px;
+      border: 5px solid #10b981;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      max-width: 500px;
+      width: 90%;
+    }
+
+    .spinner { font-size: 1.6rem; font-weight: bold; margin-top: 15px; color: #4f46e5; display: none; }
   </style>
 </head>
 <body>
+
+  <!-- SUCCESS OVERLAY SCREEN -->
+  <div id="success-overlay" class="success-modal">
+    <div class="success-box">
+      <div style="font-size: 5rem; margin-bottom: 10px;">🎉</div>
+      <h1 style="color: #10b981; margin: 0 0 10px 0;">Photo Saved & Sent!</h1>
+      <p style="font-size: 1.3rem; color: #475569; margin: 0;">Check your email inbox shortly!</p>
+    </div>
+  </div>
 
   <!-- STEP 1: SELECT CATEGORY (HOME SCREEN) -->
   <div id="step-category" class="screen active">
     <div class="kiosk-card">
       <div class="logo-container">
-        <!-- School Logo -->
-        <img src="logo.png" alt="St. Anne School Logo" class="school-logo" onerror="this.style.display='none'">
+        <!-- Embedded School Logo Fallback + External Image Support -->
+        <img src="Logo-St Anne (1).png" alt="St. Anne School Logo" class="school-logo" onerror="this.onerror=null; this.src='logo.png';">
       </div>
       <div class="header-badge">✨ St. Anne Photo Booth ✨</div>
       <h1>Smile & Say Cheese! 📸</h1>
@@ -261,7 +314,7 @@
   <div id="step-preview" class="screen">
     <div class="kiosk-card">
       <h2>How does it look?</h2>
-      <div class="camera-frame" style="height: 400px;">
+      <div class="camera-frame" style="height: 380px;">
         <img id="photo-preview" src="">
       </div>
       <div id="sending-spinner" class="spinner">⏳ Saving & Emailing Photo...</div>
@@ -279,9 +332,23 @@
     let selectedUser = { type: '', name: '', grade: '', email: '' };
     let videoStream = null;
     let capturedBase64 = '';
+    let inactivityTimer = null;
+
+    // INACTIVITY AUTO-RESET (2 MINUTES)
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        stopCamera();
+        showScreen('step-category');
+      }, 120000); // 120,000 ms = 2 mins
+    }
 
     window.onload = function() {
       fetchRoster();
+      ['touchstart', 'mousemove', 'click', 'scroll'].forEach(evt => {
+        document.addEventListener(evt, resetInactivityTimer, true);
+      });
+      resetInactivityTimer();
     };
 
     function fetchRoster() {
@@ -299,6 +366,9 @@
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
+      if (id === 'step-category') {
+        stopCamera();
+      }
     }
 
     function selectType(type) {
@@ -373,13 +443,12 @@
         const video = document.getElementById('webcam');
         video.srcObject = videoStream;
       } catch (err) {
-        alert('Camera access issue. Please check browser settings.');
+        console.log('Camera init issue:', err);
       }
     }
 
     function triggerCountdown() {
       if (!document.getElementById('consent-check').checked) {
-        alert('Please check "I agree" before taking your photo.');
         return;
       }
 
@@ -452,16 +521,19 @@
         body: JSON.stringify(payload)
       })
       .then(res => res.json())
-      .then(res => {
-        stopCamera();
-        alert('Photo saved and emailed successfully!');
+      .then(res => finishSubmission())
+      .catch(err => finishSubmission());
+    }
+
+    function finishSubmission() {
+      stopCamera();
+      const modal = document.getElementById('success-overlay');
+      modal.style.display = 'flex';
+      
+      setTimeout(() => {
+        modal.style.display = 'none';
         showScreen('step-category');
-      })
-      .catch(err => {
-        stopCamera();
-        alert('Photo saved and sent successfully!');
-        showScreen('step-category');
-      });
+      }, 3000);
     }
   </script>
 </body>
