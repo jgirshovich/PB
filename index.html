@@ -1,141 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>St. Anne Photo Booth</title>
+  <base target="_top">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body, html {
-      width: 100%;
-      height: 100%;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
+    body {
       background-color: #121212;
       color: #ffffff;
-    }
-
-    /* Start Screen Container */
-    #start-screen {
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
       text-align: center;
-      padding: 20px;
-      user-select: none;
     }
 
-    /* Logo Styling */
-    .logo {
-      width: 160px;
-      height: auto;
-      max-width: 80vw;
+    .logo-container {
       cursor: pointer;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
       margin-bottom: 20px;
     }
 
-    .logo:active {
-      transform: scale(0.95);
-      opacity: 0.8;
+    .logo-container img {
+      max-width: 150px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
-
-    .instruction {
-      margin-bottom: 25px;
-      font-size: 0.95rem;
-      color: #a0a0a0;
-    }
-
-    .btn-container {
+    .button-group {
+      margin-top: 25px;
       display: flex;
       gap: 15px;
-      margin-top: 10px;
+      justify-content: center;
     }
 
-    .start-btn {
-      padding: 14px 28px;
-      font-size: 1.1rem;
+    .btn {
+      padding: 12px 24px;
+      font-size: 16px;
       font-weight: bold;
       color: #fff;
-      background-color: #007bff;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: opacity 0.2s;
     }
 
-    .start-btn:active {
-      background-color: #0056b3;
-    }
+    .btn-student { background-color: #007bff; }
+    .btn-staff { background-color: #28a745; }
+    .btn:hover { opacity: 0.9; }
+
+    /* Views */
+    .view { display: none; }
+    .view.active { display: block; }
   </style>
 </head>
 <body>
 
-  <div id="start-screen">
-    <!-- Embedded St. Anne School Logo -->
-    <img 
-      id="app-logo" 
-      class="logo" 
-      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAH8AAAB2CAYAAADhskzbAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAFajSURBVHhe7Z13vF1F1fe/u59+zu0lN72QCgECmEDoAWmKoGBDfRBBESs+ICoKKGADFB/FjkgRsYAgQpDQpQQCCSSB9HZzc/vpZdd5/5h9bm4iTSE++LyufOZz2s05e89vZs2atX5rjSKEEPxH/r8Udfc3/iP//8h/wP//WP4D/v/Horyl1/w34cqEsvs7r18U3sA1vIHf/VfJ//2ZL0a1/8gu8n9+5u8i/waz8V8p//dnvjKq/Ud2kf/bM38XwN/ol/0z8tYecW9t8HkDmCkvt9i/XjDqf/fP/jj/FurmrQ/+Py0CCF4D/N1f7/qe/J//bPcoKC/7/W8d+T8Ovj8KvN1n4su93il14MU/Cb6E/q0N/r+VwSeE2KUBVKvV3f+MoaEhAAQKXhCQzRcQKCOvBSq26+F6vnzPh0DI5noS7mKxQrFcBsALvJHvdjwH13dHXhMOkYBgl4ESIPB8Hz9sQRCMtNHX/78p/xbgCyF26bR6q1QqGIYBQG9vL6VSCYCmpiYCoKe3D1U1SacbKZarFEplPF8gUDAMk6rtEgioVB38APwAbCdAALFEjHg8gUDBdlw8ESBQCATomslwPsdQLosb+ICKgkYA1FyHIJz5b3V5S6t9PwhAkeC/nGiqhuM6mIY58p7jOhSLRVLpNKqms3X7dlKpFJYVQdd1SqUymVSCas0nGtEAsG1QVXAcqFSqZDJRDB3K5SpCeESjUarVKqlkkoHBQTRNIx6PA1Cr1fA8D8uySITvBUJQrVSIRSIjQ0BRdg6G+vPR7/1vyFsafC/wYbdOGn25tVoNIQSmaeJ5HoqiEI1EITT11m/eysQJ4wCwXYFlKBTLLsVCiWw2x9BQFlBwHQ9dN4hGY6RSKZqamolEdNJJ8H2BrikUimUsy8Iydao1B9/3ScTlbwkgCOS1qaqCqkgLIvADlHAp+A/4/6D4ItjZUeEcCsRO9W/bNrquY5kWAJVqBdd1icViVG0XXzHoGxjimmuu4emnn2H5k08BCnMPms/yJ5eixRNSXQeCoFIBFNRYnMD1wK1ixFXGje1g4cKFfPSjH6W1tZVEIkFrSwaAcsVFURRUVUXTVNRwERUCRBBgqLylwX9Lr/myc2QT4QwToVr1g4BYLI5pWiOmlu04rN+wgcu+/nUam5ppSqY57fT309s3yHev+h6D5RLPvbSeT573WVrGTcS3fTzHJ55Ik2jpoHHMeDo6x5HINBNtaGHe/gfy85//kkymkcMPP5K9Jk9lTHsnZ3zoY9y7+CFqNQdN04lYKoYOvg+1mk8QgGmo4bW/deUtC34d6F3fk4af7/t4nkc2l8UPfJYuXcrhp333/x35Pw7+Pwq83Wfiy73eKXXgxT8JvVT6tza/eP83BInD7u3d/S/+d34Efh13/X73/pP//Z/tHgXlZb///W/1X+x8S4X/f3+0594yX8c/a2f3fP7R/yN///3R4L9B/+/y1l7zC2/gGt7A73636f8B4N+e/D9s8A0/X4Q/XAAAAABJRU5ErkJggg==" 
-      alt="St. Anne School Logo"
-    />
+  <!-- START SCREEN VIEW -->
+  <div id="startView" class="view active">
+    <div class="logo-container" onclick="toggleFullScreen()" title="Click to toggle full screen">
+      <!-- Direct image src link or base64 data link here -->
+      <img src="YOUR_LOGO_URL_HERE" alt="St. Anne Logo" onerror="this.style.display='none';">
+    </div>
 
     <h1>St. Anne Photo Booth</h1>
-    <p class="instruction">Tap the logo to toggle full-screen mode</p>
+    <p style="color: #aaa; font-size: 14px;">Tap the logo to toggle full-screen mode</p>
 
-    <div class="btn-container">
-      <button class="start-btn" onclick="alert('Student mode started!')">Student Start</button>
-      <button class="start-btn" style="background-color: #28a745;" onclick="alert('Staff mode started!')">Staff Start</button>
+    <div class="button-group">
+      <button class="btn btn-student" onclick="startMode('student')">Student Start</button>
+      <button class="btn btn-staff" onclick="startMode('staff')">Staff Start</button>
     </div>
   </div>
 
+  <!-- SELECTION / CAMERA VIEW (Restored Functional View) -->
+  <div id="mainView" class="view">
+    <h2 id="modeTitle"></h2>
+    <!-- Insert camera feed or selection workflow content here -->
+    <button class="btn btn-student" onclick="resetApp()">Back to Start</button>
+  </div>
+
   <script>
-    const logo = document.getElementById('app-logo');
+    // Screen Switcher Logic
+    function startMode(mode) {
+      document.getElementById('startView').classList.remove('active');
+      document.getElementById('mainView').classList.add('active');
+      
+      const title = mode === 'student' ? 'Student Mode' : 'Staff Mode';
+      document.getElementById('modeTitle').innerText = title;
 
-    logo.addEventListener('click', () => {
-      toggleFullscreen();
-    });
+      // Call your app initiation function here (e.g., loading student roster/camera setup)
+      if (typeof initCamera === 'function') {
+        initCamera(mode);
+      }
+    }
 
-    function toggleFullscreen() {
-      const fullScreenElement = 
-        document.fullscreenElement || 
-        document.webkitFullscreenElement || 
-        document.mozFullScreenElement || 
-        document.msFullscreenElement;
+    function resetApp() {
+      document.getElementById('mainView').classList.remove('active');
+      document.getElementById('startView').classList.add('active');
+    }
 
-      if (!fullScreenElement) {
-        const docEl = document.documentElement;
-        if (docEl.requestFullscreen) {
-          docEl.requestFullscreen();
-        } else if (docEl.webkitRequestFullscreen) {
-          docEl.webkitRequestFullscreen();
-        } else if (docEl.mozRequestFullScreen) {
-          docEl.mozRequestFullScreen();
-        } else if (docEl.msRequestFullscreen) {
-          docEl.msRequestFullscreen();
-        }
+    // Safe Full-Screen Toggle
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.warn("Full-screen request failed: ", err);
+        });
       } else {
         if (document.exitFullscreen) {
           document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
         }
       }
     }
