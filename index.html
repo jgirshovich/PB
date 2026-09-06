@@ -1,539 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>St. Anne Photo Booth Kiosk</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App with Fullscreen Logo Toggle</title>
   <style>
-    * { 
-      box-sizing: border-box; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
-    html, body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      width: 100%;
-      height: 100%;
-      min-height: 100vh;
-      background: radial-gradient(circle at center, #312e81 0%, #1e1b4b 60%, #0f172a 100%);
-      background-attachment: fixed;
-      color: #ffffff;
-      overflow-x: hidden;
-      font-size: 16px;
     }
 
-    body {
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
-      padding-left: env(safe-area-inset-left);
-      padding-right: env(safe-area-inset-right);
+    body, html {
+      width: 100%;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      background-color: #121212;
+      color: #ffffff;
+    }
+
+    /* Start Screen Layout */
+    #start-screen {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-    }
-
-    .kiosk-card {
-      background: #ffffff;
-      color: #0f172a;
-      width: 95%;
-      max-width: 900px;
-      margin: 15px auto;
-      border-radius: 28px;
-      padding: 25px 20px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(251, 191, 36, 0.2);
-      border: 5px solid #fbbf24;
-      position: relative;
-    }
-
-    .screen { display: none; width: 100%; min-height: 85vh; flex-direction: column; justify-content: center; align-items: center; }
-    .active { display: flex; }
-    
-    /* Circular Logo Container */
-    .logo-container {
-      width: 130px;
-      height: 130px;
-      margin: 0 auto 15px auto;
-      border-radius: 50%;
-      background: #ffffff;
-      padding: 6px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      border: 4px solid #312e81;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    .school-logo {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 50%;
-    }
-
-    .header-badge {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      color: #ffffff;
-      font-weight: 900;
-      font-size: 1.2rem;
-      letter-spacing: 2px;
-      padding: 8px 24px;
-      border-radius: 50px;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-      display: inline-block;
-    }
-
-    h1 { font-size: 2.5rem; margin: 8px 0 12px 0; color: #1e1b4b; font-weight: 900; }
-    h2 { font-size: 2rem; margin-bottom: 12px; color: #1e1b4b; font-weight: 800; }
-    
-    .subtitle {
-      font-size: 1.3rem;
-      color: #475569;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .btn {
-      background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-      color: #ffffff;
-      border: none;
-      padding: 20px 38px;
-      font-size: 1.6rem;
-      font-weight: 800;
-      border-radius: 20px;
-      cursor: pointer;
-      min-width: 220px;
-      box-shadow: 0 8px 0px #1e1b4b, 0 12px 25px rgba(0,0,0,0.3);
-      transition: all 0.1s ease;
-      touch-action: manipulation;
-    }
-    
-    .btn:active { transform: translateY(4px); box-shadow: 0 4px 0px #1e1b4b; }
-    .btn-secondary { background: linear-gradient(135deg, #64748b 0%, #475569 100%); box-shadow: 0 8px 0px #1e293b; color: #ffffff; }
-    .btn-green { background: linear-gradient(135deg, #10b981 0%, #047857 100%); box-shadow: 0 8px 0px #064e3b; color: #ffffff; }
-    
-    .grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 800px;
-      max-height: 45vh;
-      overflow-y: auto;
-      width: 100%;
-      padding: 10px;
-    }
-
-    .grid-btn {
-      background: #e0e7ff;
-      border: 3px solid #4338ca;
-      color: #1e1b4b;
-      font-weight: 800;
-      border-radius: 14px;
-      padding: 16px 26px;
-      margin: 8px;
-      font-size: 1.3rem;
-      cursor: pointer;
-      box-shadow: 0 4px 0px #4338ca;
-    }
-
-    .grid-btn:active { transform: translateY(2px); box-shadow: 0 2px 0px #4338ca; }
-
-    .camera-frame {
-      position: relative;
-      width: 100%;
-      max-width: 800px;
-      height: 450px;
-      background: #000;
-      border-radius: 20px;
-      overflow: hidden;
-      border: 5px solid #fbbf24;
-      margin: 10px auto;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
-
-    video, canvas, img { width: 100%; height: 100%; object-fit: cover; }
-
-    #countdown-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 8rem;
-      color: #fbbf24;
-      font-weight: 900;
-      text-shadow: 0px 0px 30px rgba(0,0,0,0.9);
-      pointer-events: none;
-    }
-
-    .info-summary {
-      font-size: 1.2rem;
-      background: #f8fafc;
-      border: 2px solid #cbd5e1;
-      padding: 10px 18px;
-      border-radius: 14px;
-      margin-bottom: 10px;
-      color: #0f172a;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-    }
-
-    .checkbox-label {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin: 10px 0;
-      color: #0f172a;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    /* Modal Success Toast */
-    .success-modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.9);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-
-    .success-box {
-      background: #ffffff;
-      color: #0f172a;
-      padding: 40px;
-      border-radius: 30px;
-      border: 5px solid #10b981;
+      height: 100vh;
       text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-      max-width: 500px;
-      width: 90%;
+      user-select: none;
     }
 
-    .spinner { font-size: 1.6rem; font-weight: bold; margin-top: 15px; color: #4f46e5; display: none; }
+    /* Logo Styling */
+    .logo {
+      width: 150px;
+      height: auto;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .logo:active {
+      transform: scale(0.95);
+      opacity: 0.8;
+    }
+
+    .instruction {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #a0a0a0;
+    }
+
+    /* Additional UI controls */
+    .start-btn {
+      margin-top: 30px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .start-btn:active {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
 
-  <!-- SUCCESS OVERLAY SCREEN -->
-  <div id="success-overlay" class="success-modal">
-    <div class="success-box">
-      <div style="font-size: 5rem; margin-bottom: 10px;">🎉</div>
-      <h1 style="color: #10b981; margin: 0 0 10px 0;">Photo Saved & Sent!</h1>
-      <p style="font-size: 1.3rem; color: #475569; margin: 0;">Check your email inbox shortly!</p>
-    </div>
-  </div>
+  <div id="start-screen">
+    <!-- Clickable/Tappable Logo -->
+    <img 
+      id="app-logo" 
+      class="logo" 
+      src="https://via.placeholder.com/150/007bff/ffffff?text=LOGO" 
+      alt="App Logo"
+    />
+    <p class="instruction">Tap logo to toggle Fullscreen</p>
 
-  <!-- STEP 1: SELECT CATEGORY (HOME SCREEN) -->
-  <div id="step-category" class="screen active">
-    <div class="kiosk-card">
-      <div class="logo-container">
-        <!-- Embedded School Logo Fallback + External Image Support -->
-        <img src="Logo-St Anne (1).png" alt="St. Anne School Logo" class="school-logo" onerror="this.onerror=null; this.src='logo.png';">
-      </div>
-      <div class="header-badge">✨ St. Anne Photo Booth ✨</div>
-      <h1>Smile & Say Cheese! 📸</h1>
-      <div class="subtitle">Tap below to get started</div>
-      <div id="loading-roster-msg" style="color:#64748b; font-size:1.2rem; margin-bottom:15px;">Loading Roster Data...</div>
-      <div class="btn-group">
-        <button class="btn" onclick="selectType('Student')">🎓 Student</button>
-        <button class="btn" onclick="selectType('Staff')">🏫 Staff</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- STEP 2: SELECT GRADE -->
-  <div id="step-grade" class="screen">
-    <div class="kiosk-card">
-      <div class="header-badge">STEP 2 OF 3</div>
-      <h1>Select Grade Level</h1>
-      <div id="grade-list" class="grid"></div>
-      <div style="margin-top: 15px;">
-        <button class="btn btn-secondary" onclick="showScreen('step-category')">⬅️ Back</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- STEP 3: SELECT NAME -->
-  <div id="step-name" class="screen">
-    <div class="kiosk-card">
-      <div class="header-badge">STEP 3 OF 3</div>
-      <h1 id="name-title">Select Your Name</h1>
-      <div id="name-list" class="grid"></div>
-      <div style="margin-top: 15px;">
-        <button class="btn btn-secondary" id="name-back-btn">⬅️ Back</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- STEP 4: LIVE CAMERA + DISCLAIMER -->
-  <div id="step-camera" class="screen">
-    <div class="kiosk-card">
-      <div class="info-summary">
-        <div><strong id="disc-name"></strong></div>
-        <div id="disc-grade" style="color:#4338ca; font-weight:bold;"></div>
-        <div id="disc-email" style="color:#047857; font-weight:bold;"></div>
-      </div>
-
-      <div class="camera-frame">
-        <video id="webcam" autoplay playsinline muted></video>
-        <div id="countdown-overlay"></div>
-      </div>
-
-      <label class="checkbox-label">
-        <input type="checkbox" id="consent-check" style="width: 24px; height: 24px;"> I agree to have my picture taken and emailed.
-      </label>
-      
-      <div>
-        <button class="btn btn-secondary" onclick="showScreen('step-name')">⬅️ Back</button>
-        <button class="btn btn-green" id="take-photo-btn" onclick="triggerCountdown()">📷 Take Photo</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- STEP 5: PREVIEW -->
-  <div id="step-preview" class="screen">
-    <div class="kiosk-card">
-      <h2>How does it look?</h2>
-      <div class="camera-frame" style="height: 380px;">
-        <img id="photo-preview" src="">
-      </div>
-      <div id="sending-spinner" class="spinner">⏳ Saving & Emailing Photo...</div>
-      <div id="preview-actions" style="margin-top: 15px;">
-        <button class="btn btn-secondary" onclick="retakePhoto()">🔄 Retake</button>
-        <button class="btn btn-green" id="keep-btn" onclick="uploadPhoto()">✨ Keep & Send</button>
-      </div>
-    </div>
+    <button class="start-btn" onclick="alert('App Started!')">Start</button>
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI6RBMvwoEenJJa4GNeGqEDLvdWVXYcifV4eb3bwwhu6xPN4N8hAr3ePB4MSxczlbK/exec';
+    const logo = document.getElementById('app-logo');
 
-    let roster = { students: [], staff: [] };
-    let selectedUser = { type: '', name: '', grade: '', email: '' };
-    let videoStream = null;
-    let capturedBase64 = '';
-    let inactivityTimer = null;
+    logo.addEventListener('click', () => {
+      toggleFullscreen();
+    });
 
-    // INACTIVITY AUTO-RESET (2 MINUTES)
-    function resetInactivityTimer() {
-      clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(() => {
-        stopCamera();
-        showScreen('step-category');
-      }, 120000); // 120,000 ms = 2 mins
-    }
+    function toggleFullscreen() {
+      // Check if full screen is currently active across different browser implementations
+      const fullScreenElement = 
+        document.fullscreenElement || 
+        document.webkitFullscreenElement || 
+        document.mozFullScreenElement || 
+        document.msFullscreenElement;
 
-    window.onload = function() {
-      fetchRoster();
-      ['touchstart', 'mousemove', 'click', 'scroll'].forEach(evt => {
-        document.addEventListener(evt, resetInactivityTimer, true);
-      });
-      resetInactivityTimer();
-    };
-
-    function fetchRoster() {
-      fetch(SCRIPT_URL)
-        .then(res => res.json())
-        .then(data => {
-          roster = data;
-          document.getElementById('loading-roster-msg').style.display = 'none';
-        })
-        .catch(err => {
-          document.getElementById('loading-roster-msg').innerText = 'Error loading roster data.';
-        });
-    }
-
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      if (id === 'step-category') {
-        stopCamera();
-      }
-    }
-
-    function selectType(type) {
-      selectedUser.type = type;
-      if (type === 'Student') {
-        renderGrades();
-        showScreen('step-grade');
-      } else {
-        renderNames(roster.staff);
-        document.getElementById('name-title').innerText = 'Select Staff Name';
-        document.getElementById('name-back-btn').onclick = () => showScreen('step-category');
-        showScreen('step-name');
-      }
-    }
-
-    function renderGrades() {
-      const grades = [...new Set(roster.students.map(s => s.grade))].sort();
-      const container = document.getElementById('grade-list');
-      container.innerHTML = '';
-      grades.forEach(g => {
-        const btn = document.createElement('button');
-        btn.className = 'grid-btn';
-        btn.innerText = `Grade ${g}`;
-        btn.onclick = () => selectGrade(g);
-        container.appendChild(btn);
-      });
-    }
-
-    function selectGrade(grade) {
-      selectedUser.grade = grade;
-      const filteredStudents = roster.students.filter(s => s.grade === grade);
-      renderNames(filteredStudents);
-      document.getElementById('name-title').innerText = `Grade ${grade} Roster`;
-      document.getElementById('name-back-btn').onclick = () => showScreen('step-grade');
-      showScreen('step-name');
-    }
-
-    function renderNames(list) {
-      const container = document.getElementById('name-list');
-      container.innerHTML = '';
-      list.forEach(item => {
-        const btn = document.createElement('button');
-        btn.className = 'grid-btn';
-        btn.innerText = item.name;
-        btn.onclick = () => selectPerson(item);
-        container.appendChild(btn);
-      });
-    }
-
-    function selectPerson(person) {
-      selectedUser.name = person.name;
-      selectedUser.email = person.email || '';
-      
-      document.getElementById('disc-name').innerText = selectedUser.name;
-      document.getElementById('disc-grade').innerText = selectedUser.type === 'Student' ? `Grade: ${selectedUser.grade}` : 'Staff Member';
-      document.getElementById('disc-email').innerText = selectedUser.email ? `✉️ ${selectedUser.email}` : '⚠️ No email on file';
-      document.getElementById('consent-check').checked = false;
-      document.getElementById('countdown-overlay').innerText = '';
-      document.getElementById('take-photo-btn').disabled = false;
-      
-      showScreen('step-camera');
-      startLiveCamera();
-    }
-
-    async function startLiveCamera() {
-      if (videoStream) return;
-      try {
-        videoStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
-          audio: false
-        });
-        const video = document.getElementById('webcam');
-        video.srcObject = videoStream;
-      } catch (err) {
-        console.log('Camera init issue:', err);
-      }
-    }
-
-    function triggerCountdown() {
-      if (!document.getElementById('consent-check').checked) {
-        return;
-      }
-
-      document.getElementById('take-photo-btn').disabled = true;
-      let count = 3;
-      const overlay = document.getElementById('countdown-overlay');
-      overlay.innerText = count;
-      
-      const interval = setInterval(() => {
-        count--;
-        if (count > 0) {
-          overlay.innerText = count;
-        } else if (count === 0) {
-          overlay.innerText = '📸';
-        } else {
-          clearInterval(interval);
-          overlay.innerText = '';
-          snapPhoto();
+      if (!fullScreenElement) {
+        // Enter Fullscreen
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) {
+          docEl.requestFullscreen();
+        } else if (docEl.webkitRequestFullscreen) { /* Safari / Older Chrome */
+          docEl.webkitRequestFullscreen();
+        } else if (docEl.mozRequestFullScreen) { /* Firefox */
+          docEl.mozRequestFullScreen();
+        } else if (docEl.msRequestFullscreen) { /* IE/Edge */
+          docEl.msRequestFullscreen();
         }
-      }, 1000);
-    }
-
-    function snapPhoto() {
-      const video = document.getElementById('webcam');
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth || 1280;
-      canvas.height = video.videoHeight || 720;
-      
-      const ctx = canvas.getContext('2d');
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      
-      capturedBase64 = canvas.toDataURL('image/jpeg', 0.85);
-      document.getElementById('photo-preview').src = capturedBase64;
-      
-      document.getElementById('preview-actions').style.display = 'block';
-      document.getElementById('sending-spinner').style.display = 'none';
-      showScreen('step-preview');
-    }
-
-    function stopCamera() {
-      if (videoStream) {
-        videoStream.getTracks().forEach(track => track.stop());
-        videoStream = null;
+      } else {
+        // Exit Fullscreen
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { /* Safari */
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) { /* Firefox */
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) { /* IE/Edge */
+          document.msExitFullscreen();
+        }
       }
-    }
-
-    function retakePhoto() {
-      showScreen('step-camera');
-      document.getElementById('consent-check').checked = true;
-      document.getElementById('take-photo-btn').disabled = false;
-    }
-
-    function uploadPhoto() {
-      document.getElementById('preview-actions').style.display = 'none';
-      document.getElementById('sending-spinner').style.display = 'block';
-      
-      const payload = {
-        imageBase64: capturedBase64,
-        type: selectedUser.type,
-        name: selectedUser.name,
-        grade: selectedUser.grade,
-        email: selectedUser.email
-      };
-
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(res => finishSubmission())
-      .catch(err => finishSubmission());
-    }
-
-    function finishSubmission() {
-      stopCamera();
-      const modal = document.getElementById('success-overlay');
-      modal.style.display = 'flex';
-      
-      setTimeout(() => {
-        modal.style.display = 'none';
-        showScreen('step-category');
-      }, 3000);
     }
   </script>
 </body>
