@@ -356,6 +356,12 @@
       <label class="checkbox-label">
         <input type="checkbox" id="consent-check" style="width: 24px; height: 24px;"> I agree to have my picture taken and emailed.
       </label>
+      <div id="consent-hint" style="display:none; color:#dc2626; font-weight:700; font-size:1.05rem; margin-bottom:8px;">
+        ☝️ Please check the box above before taking your photo
+      </div>
+      <div id="camera-error-msg" style="display:none; color:#dc2626; font-weight:700; font-size:1.05rem; margin-bottom:8px;">
+        ⚠️ Couldn't access the camera. Please check camera permissions and try again.
+      </div>
 
       <div>
         <button class="btn btn-secondary" onclick="showScreen('step-name')">⬅️ Back</button>
@@ -511,12 +517,15 @@
       document.getElementById('consent-check').checked = false;
       document.getElementById('countdown-overlay').innerText = '';
       document.getElementById('take-photo-btn').disabled = false;
+      document.getElementById('consent-hint').style.display = 'none';
+      document.getElementById('camera-error-msg').style.display = 'none';
 
       showScreen('step-camera');
       startLiveCamera();
     }
 
     async function startLiveCamera() {
+      document.getElementById('camera-error-msg').style.display = 'none';
       if (videoStream) return;
       try {
         videoStream = await navigator.mediaDevices.getUserMedia({
@@ -527,13 +536,18 @@
         video.srcObject = videoStream;
       } catch (err) {
         console.log('Camera init issue:', err);
+        document.getElementById('camera-error-msg').style.display = 'block';
       }
     }
 
     function triggerCountdown() {
       if (!document.getElementById('consent-check').checked) {
+        const hint = document.getElementById('consent-hint');
+        hint.style.display = 'block';
+        setTimeout(() => { hint.style.display = 'none'; }, 3000);
         return;
       }
+      document.getElementById('consent-hint').style.display = 'none';
 
       document.getElementById('take-photo-btn').disabled = true;
       let count = 3;
@@ -555,22 +569,31 @@
     }
 
     function snapPhoto() {
-      const video = document.getElementById('webcam');
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth || 1280;
-      canvas.height = video.videoHeight || 720;
+      try {
+        const video = document.getElementById('webcam');
+        if (!video.videoWidth) {
+          throw new Error('No live video feed available');
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-      const ctx = canvas.getContext('2d');
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const ctx = canvas.getContext('2d');
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      capturedBase64 = canvas.toDataURL('image/jpeg', 0.85);
-      document.getElementById('photo-preview').src = capturedBase64;
+        capturedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+        document.getElementById('photo-preview').src = capturedBase64;
 
-      document.getElementById('preview-actions').style.display = 'block';
-      document.getElementById('sending-spinner').style.display = 'none';
-      showScreen('step-preview');
+        document.getElementById('preview-actions').style.display = 'block';
+        document.getElementById('sending-spinner').style.display = 'none';
+        showScreen('step-preview');
+      } catch (err) {
+        console.log('Snap photo failed:', err);
+        document.getElementById('camera-error-msg').style.display = 'block';
+        document.getElementById('take-photo-btn').disabled = false;
+      }
     }
 
     function stopCamera() {
